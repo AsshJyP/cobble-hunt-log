@@ -2,7 +2,6 @@ package io.github.asshjyp.cobblehuntlog;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.pokemon.Species;
-import io.github.asshjyp.cobblehuntlog.HuntConfig.HudCorner;
 import io.github.asshjyp.cobblehuntlog.HuntConfig.RecordMode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -86,12 +85,11 @@ public class HuntConfigScreen extends Screen {
 				.create(right, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("cobblehuntlog.config.show_hud"),
 						(button, value) -> config.showHud = value));
 		y += ROW;
-		addRenderableWidget(CycleButton.<HudCorner>builder(corner -> Component.translatable(
-						"cobblehuntlog.config.hud_corner." + corner.name().toLowerCase(Locale.ROOT)))
-				.withValues(HudCorner.values())
-				.withInitialValue(config.hudCorner)
-				.create(left, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("cobblehuntlog.config.hud_corner"),
-						(button, value) -> config.hudCorner = value));
+		addRenderableWidget(Button.builder(Component.translatable("cobblehuntlog.config.edit_hud"),
+						button -> minecraft.setScreen(new HudEditScreen(this)))
+				.bounds(left, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+				.tooltip(Tooltip.create(Component.translatable("cobblehuntlog.config.edit_hud.tooltip")))
+				.build());
 		// "Tasa: 1 / [8192]": la etiqueta se dibuja en render(), la caja ocupa el resto de la columna
 		Component rateLabel = Component.translatable("cobblehuntlog.config.shiny_rate");
 		rateLabelX = right;

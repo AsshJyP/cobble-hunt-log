@@ -14,11 +14,6 @@
 	"cobblehuntlog.config.open_folder": "Abrir carpeta de grabaciones",
 	"cobblehuntlog.config.counter": "Contador",
 	"cobblehuntlog.config.show_hud": "Mostrar HUD",
-	"cobblehuntlog.config.hud_corner": "HUD",
-	"cobblehuntlog.config.hud_corner.top_left": "Arriba izq.",
-	"cobblehuntlog.config.hud_corner.top_right": "Arriba der.",
-	"cobblehuntlog.config.hud_corner.bottom_left": "Abajo izq.",
-	"cobblehuntlog.config.hud_corner.bottom_right": "Abajo der.",
 	"cobblehuntlog.config.shiny_rate": "Tasa: 1 /",
 	"cobblehuntlog.config.shiny_rate.tooltip": "Probabilidad de shiny del servidor. Cobblemon usa 8192 por defecto.",
 	"cobblehuntlog.config.lock_species": "Especie fija: %s",
@@ -37,5 +32,11 @@
 	"cobblehuntlog.config.history": "Historial de shinies (%s)",
 	"cobblehuntlog.history.title": "Historial de shinies",
 	"cobblehuntlog.history.empty": "Aún no hay shinies. ¡Suerte con la caza!",
-	"cobblehuntlog.history.entry": "%s encuentros · %s de caza · %s"
+	"cobblehuntlog.history.entry": "%s encuentros · %s de caza · %s",
+	"cobblehuntlog.config.edit_hud": "Mover y escalar HUD…",
+	"cobblehuntlog.config.edit_hud.tooltip": "Arrastra el HUD a donde quieras y cambia su tamaño con la rueda del ratón.",
+	"cobblehuntlog.edit.title": "Mover y escalar HUD",
+	"cobblehuntlog.edit.help": "Arrastra para mover · Rueda: tamaño · Flechas: afinar (Mayús = 10)",
+	"cobblehuntlog.edit.scale": "Tamaño: ×%s",
+	"cobblehuntlog.edit.reset": "Restablecer"
 }

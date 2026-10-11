@@ -14,11 +14,6 @@
 	"cobblehuntlog.config.open_folder": "Open recordings folder",
 	"cobblehuntlog.config.counter": "Counter",
 	"cobblehuntlog.config.show_hud": "Show HUD",
-	"cobblehuntlog.config.hud_corner": "HUD",
-	"cobblehuntlog.config.hud_corner.top_left": "Top left",
-	"cobblehuntlog.config.hud_corner.top_right": "Top right",
-	"cobblehuntlog.config.hud_corner.bottom_left": "Bottom left",
-	"cobblehuntlog.config.hud_corner.bottom_right": "Bottom right",
 	"cobblehuntlog.config.shiny_rate": "Rate: 1 /",
 	"cobblehuntlog.config.shiny_rate.tooltip": "The server's shiny rate. Cobblemon's default is 8192.",
 	"cobblehuntlog.config.lock_species": "Locked species: %s",
@@ -37,5 +32,11 @@
 	"cobblehuntlog.config.history": "Shiny history (%s)",
 	"cobblehuntlog.history.title": "Shiny history",
 	"cobblehuntlog.history.empty": "No shinies yet. Good luck hunting!",
-	"cobblehuntlog.history.entry": "%s encounters · %s hunting · %s"
+	"cobblehuntlog.history.entry": "%s encounters · %s hunting · %s",
+	"cobblehuntlog.config.edit_hud": "Move and resize HUD…",
+	"cobblehuntlog.config.edit_hud.tooltip": "Drag the HUD wherever you want and change its size with the mouse wheel.",
+	"cobblehuntlog.edit.title": "Move and resize HUD",
+	"cobblehuntlog.edit.help": "Drag to move · Wheel: size · Arrows: fine-tune (Shift = 10)",
+	"cobblehuntlog.edit.scale": "Size: ×%s",
+	"cobblehuntlog.edit.reset": "Reset"
 }

@@ -16,3 +16,4 @@ Solo usa la información de tus propios combates, la misma que ves en pantalla. 
 .\gradlew build
 ```
 El `.jar` queda en `build/libs/`.
+

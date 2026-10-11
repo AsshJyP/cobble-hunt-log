@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "cobblehuntlog",
+	"version": "${version}",
+	"name": "Cobble Hunt Log",
+	"description": "Records your battles against special wild Pokémon (shiny, legendary, mythical, ultra beast) to text files, with an optional shiny hunt counter and HUD.",
+	"authors": [
+		"AsshJyP"
+	],
+	"contact": {
+		"sources": "https://github.com/AsshJyP/cobble-hunt-log"
+	},
+	"license": "MIT",
+	"icon": "assets/cobblehuntlog/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"io.github.asshjyp.cobblehuntlog.CobbleHuntLog"
+		],
+		"modmenu": [
+			"io.github.asshjyp.cobblehuntlog.ModMenuIntegration"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*",
+		"cobblemon": ">=1.7.0"
+	},
+	"recommends": {
+		"modmenu": "*"
+	}
+}

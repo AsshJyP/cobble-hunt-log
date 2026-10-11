@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -99,8 +100,9 @@ public final class HuntHud {
 	private static void render(GuiGraphics graphics) {
 		Minecraft client = Minecraft.getInstance();
 		HuntConfig config = CobbleHuntLog.CONFIG;
-		// F1 (hideGui), F3 y cualquier pantalla abierta lo ocultan
-		if (!config.counterEnabled || !config.showHud || client.screen != null
+		// F1 (hideGui), F3 y cualquier pantalla abierta lo ocultan, salvo "Mover y escalar HUD" de otro mod
+		if (!config.counterEnabled || !config.showHud
+				|| (client.screen != null && !isOtherHudEditor(client.screen))
 				|| client.options.hideGui || client.getDebugOverlay().showDebugScreen()) {
 			return;
 		}
@@ -117,6 +119,19 @@ public final class HuntHud {
 		int h = scaled(size[1], config.hudScale);
 		int[] pos = position(config, graphics.guiWidth(), graphics.guiHeight(), w, h);
 		draw(graphics, client.font, content, pos[0], pos[1], config.hudScale);
+	}
+
+	/**
+	 * Pantalla "Mover y escalar HUD" de otro mod de AsshJyP (Cobble EV Tracker…): con ella abierta este HUD
+	 * se sigue viendo, para colocar los dos juntos. Convención compartida, sin depender del otro mod:
+	 * clase llamada {@code HudEditScreen} en un paquete {@code io.github.asshjyp.*}. La propia no cuenta,
+	 * porque ya dibuja su vista previa.
+	 */
+	static boolean isOtherHudEditor(Screen screen) {
+		Class<?> type = screen.getClass();
+		return !(screen instanceof HudEditScreen)
+				&& type.getSimpleName().equals("HudEditScreen")
+				&& type.getName().startsWith("io.github.asshjyp.");
 	}
 
 	public static int scaled(int length, float scale) {

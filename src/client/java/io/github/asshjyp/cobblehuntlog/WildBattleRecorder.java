@@ -5,6 +5,7 @@ import kotlin.Unit;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -33,8 +34,17 @@ public final class WildBattleRecorder implements BattleWatcher.Listener {
 	private static final String SINGLE_LINE = "─────────────────────────────────────────────────";
 	private static final DateTimeFormatter FILE_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
 	private static final DateTimeFormatter HEADER_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	/** "Turno: 3" (es_es) o "It is now turn 3" (en_us): se separa con una línea, como Battle Extras. */
-	private static final Pattern TURN = Pattern.compile("^(Turno: |It is now turn )\\d+$");
+	/**
+	 * Respaldo para el mensaje de turno ("Turno: 3" de es_es en Cobblemon 1.7, "Turno n.º 3" en 1.8,
+	 * "It is now turn 3" de en_us), por si la traducción cargada no sirve. Se separa con una línea, como Battle Extras.
+	 */
+	private static final Pattern TURN_FALLBACK = Pattern.compile("^(Turno: |Turno n\\.º |It is now turn )\\d+$");
+	private static final String TURN_KEY = "cobblemon.battle.turn";
+	/** El número de turno en la traducción: "%1$s" o "%s". */
+	private static final Pattern TURN_ARG = Pattern.compile("%(?:1\\$)?s");
+	/** Patrón sacado de la traducción cargada, y la traducción de la que salió (cambia si cambia el idioma). */
+	private static String turnTemplate;
+	private static Pattern turnPattern;
 	/** Puntuación con la que termina un mensaje de combate. */
 	private static final Pattern END_OF_MESSAGE = Pattern.compile("[.!?)\\]…»\"]$");
 
@@ -124,6 +134,29 @@ public final class WildBattleRecorder implements BattleWatcher.Listener {
 	}
 
 	/**
+	 * ¿Es el mensaje "Turno N"? Se compara con la traducción que tiene cargada el juego de
+	 * {@code cobblemon.battle.turn}, así sirve en cualquier idioma y aunque Cobblemon cambie el texto
+	 * (en español pasó de "Turno: %1$s" en 1.7 a "Turno n.º %1$s" en 1.8). Si no coincide, se prueba el respaldo.
+	 */
+	static boolean isTurnMessage(String line) {
+		String template = Language.getInstance().getOrDefault(TURN_KEY);
+		if (!template.equals(turnTemplate)) {
+			turnTemplate = template;
+			turnPattern = turnPatternFor(template);
+		}
+		return (turnPattern != null && turnPattern.matcher(line).matches()) || TURN_FALLBACK.matcher(line).matches();
+	}
+
+	/** "Turno n.º %1$s" → ^\QTurno n.º \E\d+$. Null si la traducción no lleva el número (o falta la clave). */
+	static Pattern turnPatternFor(String template) {
+		String[] parts = TURN_ARG.split(template, -1);
+		if (parts.length != 2) {
+			return null;
+		}
+		return Pattern.compile("^" + Pattern.quote(parts[0].strip()) + "\\s*\\d+\\s*" + Pattern.quote(parts[1].strip()) + "$");
+	}
+
+	/**
 	 * Quita las marcas crudas del protocolo de Showdown que a veces se cuelan como mensaje (ej. "|-ohko" tras un
 	 * movimiento de KO directo). Hay que hacerlo en cada trozo, antes de unirlos: "|-ohko" no termina en
 	 * puntuación y se pegaría al mensaje siguiente. "|-ohko" solo → vacío; "|-ohko Texto" → "Texto".
@@ -175,7 +208,7 @@ public final class WildBattleRecorder implements BattleWatcher.Listener {
 			if (line.isEmpty()) {
 				return;
 			}
-			if (TURN.matcher(line).matches()) {
+			if (isTurnMessage(line)) {
 				flushPending();
 				messages++;
 				write("\n" + SINGLE_LINE + "\n" + line);

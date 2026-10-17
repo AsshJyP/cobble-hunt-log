@@ -29,6 +29,12 @@ public class HuntConfigScreen extends Screen {
 	private static final int GAP = 10;
 	private static final int ROW = 24;
 	private static final int SECTION = 16;
+	/** Si no cabe en la pantalla: filas de 21 (botones de 20 sin tocarse) y títulos de sección de 12. */
+	private static final int MIN_ROW = BUTTON_HEIGHT + 1;
+	private static final int MIN_SECTION = 12;
+	/** Hueco arriba para el título y margen abajo bajo "Listo". */
+	private static final int TOP = 28;
+	private static final int BOTTOM_MARGIN = 4;
 
 	private final Screen parent;
 	private Button lockButton;
@@ -51,13 +57,22 @@ public class HuntConfigScreen extends Screen {
 		int left = width / 2 - BUTTON_WIDTH - GAP / 2;
 		int right = width / 2 + GAP / 2;
 		int fullWidth = BUTTON_WIDTH * 2 + GAP;
-		// Alto total: 2 títulos de sección, 7 filas, separaciones y el botón "Listo"
-		int contentHeight = SECTION * 2 + ROW * 7 + 6 + 8 + BUTTON_HEIGHT;
-		int y = Math.max(28, (height - contentHeight) / 2 + 8);
+		// Alto total: 2 títulos de sección, 7 filas, separaciones y el botón "Listo".
+		// Si no cabe (ventana baja o escala de interfaz grande), se juntan las filas en vez de cortar "Listo" abajo
+		int fixed = 6 + 8 + BUTTON_HEIGHT;
+		int available = height - TOP - BOTTOM_MARGIN;
+		int row = ROW;
+		int section = SECTION;
+		if (section * 2 + row * 7 + fixed > available) {
+			section = MIN_SECTION;
+			row = Math.clamp((available - section * 2 - fixed) / 7, MIN_ROW, ROW);
+		}
+		int contentHeight = section * 2 + row * 7 + fixed;
+		int y = Math.max(TOP, (height - contentHeight) / 2 + 8);
 
 		// --- Grabación ---
 		recordingTitleY = y;
-		y += SECTION;
+		y += section;
 		addRenderableWidget(CycleButton.onOffBuilder(config.recordingEnabled)
 				.create(left, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("cobblehuntlog.config.recording"),
 						(button, value) -> config.recordingEnabled = value));
@@ -69,22 +84,22 @@ public class HuntConfigScreen extends Screen {
 						"cobblehuntlog.config.record_mode." + mode.name().toLowerCase(Locale.ROOT) + ".tooltip")))
 				.create(right, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("cobblehuntlog.config.record_mode"),
 						(button, value) -> config.recordMode = value));
-		y += ROW;
+		y += row;
 		addRenderableWidget(Button.builder(Component.translatable("cobblehuntlog.config.open_folder"), button -> openFolder())
 				.bounds(left, y, fullWidth, BUTTON_HEIGHT)
 				.build());
-		y += ROW + 6;
+		y += row + 6;
 
 		// --- Caza de shiny ---
 		huntTitleY = y;
-		y += SECTION;
+		y += section;
 		addRenderableWidget(CycleButton.onOffBuilder(config.counterEnabled)
 				.create(left, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("cobblehuntlog.config.counter"),
 						(button, value) -> config.counterEnabled = value));
 		addRenderableWidget(CycleButton.onOffBuilder(config.showHud)
 				.create(right, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("cobblehuntlog.config.show_hud"),
 						(button, value) -> config.showHud = value));
-		y += ROW;
+		y += row;
 		addRenderableWidget(Button.builder(Component.translatable("cobblehuntlog.config.edit_hud"),
 						button -> minecraft.setScreen(new HudEditScreen(this)))
 				.bounds(left, y, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -107,12 +122,12 @@ public class HuntConfigScreen extends Screen {
 			}
 		});
 		addRenderableWidget(rateBox);
-		y += ROW;
+		y += row;
 		lockButton = addRenderableWidget(Button.builder(lockLabel(), button -> toggleLock())
 				.bounds(left, y, fullWidth, BUTTON_HEIGHT)
 				.tooltip(Tooltip.create(Component.translatable("cobblehuntlog.config.lock_species.tooltip")))
 				.build());
-		y += ROW;
+		y += row;
 		// Reiniciar pide dos clics: el primero solo cambia el texto a "¿Seguro?"
 		resetConfirm = false;
 		resetButton = addRenderableWidget(Button.builder(resetLabel(), button -> {
@@ -129,7 +144,7 @@ public class HuntConfigScreen extends Screen {
 				})
 				.bounds(left, y, fullWidth, BUTTON_HEIGHT)
 				.build());
-		y += ROW;
+		y += row;
 		addRenderableWidget(Button.builder(Component.translatable("cobblehuntlog.config.history",
 								HuntCounter.history().size()), button -> minecraft.setScreen(new HuntHistoryScreen(this)))
 				.bounds(left, y, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -141,7 +156,7 @@ public class HuntConfigScreen extends Screen {
 				.tooltip(Tooltip.create(Component.translatable("cobblehuntlog.config.bonuses.tooltip")
 						.append("\n").append(HuntBonusScreen.effectiveLine())))
 				.build());
-		y += ROW + 8;
+		y += row + 8;
 
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
 				.bounds(width / 2 - 100, y, 200, BUTTON_HEIGHT)

@@ -38,5 +38,12 @@
 	"cobblehuntlog.edit.title": "Mover y escalar HUD",
 	"cobblehuntlog.edit.help": "Arrastra para mover · Rueda: tamaño · Flechas: afinar (Mayús = 10)",
 	"cobblehuntlog.edit.scale": "Tamaño: ×%s",
-	"cobblehuntlog.edit.reset": "Restablecer"
+	"cobblehuntlog.edit.reset": "Restablecer",
+	"cobblehuntlog.config.bonuses": "Bonificadores (%s)…",
+	"cobblehuntlog.config.bonuses.add": "Añadir bonificador",
+	"cobblehuntlog.config.bonuses.effective": "Tasa efectiva: 1/%s (+%s %%)",
+	"cobblehuntlog.config.bonuses.tooltip": "Suma aquí los bonus de shiny de tu servidor (armaduras, eventos, tickets…). Se suman entre sí y multiplican la probabilidad base.",
+	"cobblehuntlog.bonuses.title": "Bonificadores de shiny",
+	"cobblehuntlog.bonuses.help": "Se suman entre sí y multiplican la probabilidad base.",
+	"cobblehuntlog.bonuses.remove": "Eliminar este bonificador"
 }

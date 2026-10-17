@@ -132,7 +132,14 @@ public class HuntConfigScreen extends Screen {
 		y += ROW;
 		addRenderableWidget(Button.builder(Component.translatable("cobblehuntlog.config.history",
 								HuntCounter.history().size()), button -> minecraft.setScreen(new HuntHistoryScreen(this)))
-				.bounds(left, y, fullWidth, BUTTON_HEIGHT)
+				.bounds(left, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+				.build());
+		// Los bonificadores van en pantalla propia: 8 filas no caben aquí sin scroll
+		addRenderableWidget(Button.builder(Component.translatable("cobblehuntlog.config.bonuses",
+								config.shinyBonuses.size()), button -> minecraft.setScreen(new HuntBonusScreen(this)))
+				.bounds(right, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+				.tooltip(Tooltip.create(Component.translatable("cobblehuntlog.config.bonuses.tooltip")
+						.append("\n").append(HuntBonusScreen.effectiveLine())))
 				.build());
 		y += ROW + 8;
 

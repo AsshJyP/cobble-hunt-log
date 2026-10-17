@@ -38,5 +38,12 @@
 	"cobblehuntlog.edit.title": "Move and resize HUD",
 	"cobblehuntlog.edit.help": "Drag to move · Wheel: size · Arrows: fine-tune (Shift = 10)",
 	"cobblehuntlog.edit.scale": "Size: ×%s",
-	"cobblehuntlog.edit.reset": "Reset"
+	"cobblehuntlog.edit.reset": "Reset",
+	"cobblehuntlog.config.bonuses": "Shiny bonuses (%s)…",
+	"cobblehuntlog.config.bonuses.add": "Add bonus",
+	"cobblehuntlog.config.bonuses.effective": "Effective rate: 1/%s (+%s%%)",
+	"cobblehuntlog.config.bonuses.tooltip": "Add your server's shiny bonuses here (armor, events, tickets…). They add up and multiply the base chance.",
+	"cobblehuntlog.bonuses.title": "Shiny bonuses",
+	"cobblehuntlog.bonuses.help": "They add up and multiply the base chance.",
+	"cobblehuntlog.bonuses.remove": "Remove this bonus"
 }

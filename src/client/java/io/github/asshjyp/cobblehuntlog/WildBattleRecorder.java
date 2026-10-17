@@ -123,6 +123,20 @@ public final class WildBattleRecorder implements BattleWatcher.Listener {
 		return text.replaceAll("[^\\p{L}\\p{N}_-]", "");
 	}
 
+	/**
+	 * Quita las marcas crudas del protocolo de Showdown que a veces se cuelan como mensaje (ej. "|-ohko" tras un
+	 * movimiento de KO directo). Hay que hacerlo en cada trozo, antes de unirlos: "|-ohko" no termina en
+	 * puntuación y se pegaría al mensaje siguiente. "|-ohko" solo → vacío; "|-ohko Texto" → "Texto".
+	 */
+	static String withoutProtocol(String line) {
+		line = line.strip();
+		if (line.startsWith("|")) {
+			int space = line.indexOf(' ');
+			line = space < 0 ? "" : line.substring(space + 1).strip();
+		}
+		return line;
+	}
+
 	private static String toPlainText(FormattedCharSequence message) {
 		StringBuilder text = new StringBuilder();
 		message.accept((index, style, codePoint) -> {
@@ -155,6 +169,10 @@ public final class WildBattleRecorder implements BattleWatcher.Listener {
 		 */
 		void onMessage(String line) {
 			if (closed) {
+				return;
+			}
+			line = withoutProtocol(line);
+			if (line.isEmpty()) {
 				return;
 			}
 			if (TURN.matcher(line).matches()) {

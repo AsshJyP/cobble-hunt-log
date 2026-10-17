@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
 import java.util.Locale;
@@ -51,13 +52,20 @@ public final class HuntHud {
 	}
 
 	private static Content content(String speciesId, int encounters, long huntMillis, double chance) {
-		int rate = CobbleHuntLog.CONFIG.shinyRate;
+		HuntConfig config = CobbleHuntLog.CONFIG;
+		// "Prob.: 12.4 % (1/6068)" con la tasa efectiva; si hay bonificadores, "+35 %" en dorado detrás
+		MutableComponent chanceLine = Component.translatable("cobblehuntlog.hud.chance",
+				String.format(Locale.ROOT, "%.1f", chance * 100), Math.round(config.effectiveRate()));
+		double bonus = config.bonusTotal();
+		if (bonus > 0) {
+			chanceLine.append(" ").append(Component.translatable("cobblehuntlog.hud.bonus",
+					HuntBonusScreen.format(bonus)).withStyle(ChatFormatting.GOLD));
+		}
 		return new Content(List.of(
 				HuntConfigScreen.speciesName(speciesId).copy().withStyle(ChatFormatting.GOLD),
 				Component.translatable("cobblehuntlog.hud.encounters", encounters),
 				Component.translatable("cobblehuntlog.hud.time", formatTime(huntMillis)),
-				Component.translatable("cobblehuntlog.hud.chance",
-						String.format(Locale.ROOT, "%.1f", chance * 100), rate)));
+				chanceLine));
 	}
 
 	/** Ancho y alto del recuadro sin escalar, en píxeles de la interfaz. */

@@ -45,5 +45,6 @@
 	"cobblehuntlog.config.bonuses.tooltip": "Suma aquí los bonus de shiny de tu servidor (armaduras, eventos, tickets…). Se suman entre sí y multiplican la probabilidad base.",
 	"cobblehuntlog.bonuses.title": "Bonificadores de shiny",
 	"cobblehuntlog.bonuses.help": "Se suman entre sí y multiplican la probabilidad base.",
-	"cobblehuntlog.bonuses.remove": "Eliminar este bonificador"
+	"cobblehuntlog.bonuses.remove": "Eliminar este bonificador",
+	"cobblehuntlog.hud.bonus": "+%s %%"
 }

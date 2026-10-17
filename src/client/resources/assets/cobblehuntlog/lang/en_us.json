@@ -45,5 +45,6 @@
 	"cobblehuntlog.config.bonuses.tooltip": "Add your server's shiny bonuses here (armor, events, tickets…). They add up and multiply the base chance.",
 	"cobblehuntlog.bonuses.title": "Shiny bonuses",
 	"cobblehuntlog.bonuses.help": "They add up and multiply the base chance.",
-	"cobblehuntlog.bonuses.remove": "Remove this bonus"
+	"cobblehuntlog.bonuses.remove": "Remove this bonus",
+	"cobblehuntlog.hud.bonus": "+%s%%"
 }

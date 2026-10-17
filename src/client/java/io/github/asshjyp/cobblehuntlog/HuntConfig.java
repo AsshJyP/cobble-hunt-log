@@ -11,6 +11,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuración en {@code config/cobblehuntlog/config.json}. Se lee al arrancar Minecraft;
@@ -32,10 +34,13 @@ public final class HuntConfig {
 	public static final int MAX_OFFSET = 999;
 	public static final float MIN_SCALE = 0.5f;
 	public static final float MAX_SCALE = 2.0f;
+	/** Bonificadores: cuántas filas caben y el valor máximo de cada una, en %. */
+	public static final int MAX_BONUSES = 8;
+	public static final double MAX_BONUS = 1000;
 
 	// Gson ignora este campo al leer; solo sirve de ayuda a quien edite el archivo
 	@SuppressWarnings("unused")
-	private String _info = "Todo se cambia también desde el menú (tecla H o Mod Menu). recordMode: SPECIAL_ONLY o ALL. hudCorner: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT o BOTTOM_RIGHT; hudOffsetX/hudOffsetY lo separan de esa esquina (en píxeles de la interfaz) y hudScale es su tamaño (0.5 a 2). Lo más cómodo es el botón \"Mover y escalar HUD\" del menú.";
+	private String _info = "Todo se cambia también desde el menú (tecla H o Mod Menu). recordMode: SPECIAL_ONLY o ALL. hudCorner: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT o BOTTOM_RIGHT; hudOffsetX/hudOffsetY lo separan de esa esquina (en píxeles de la interfaz) y hudScale es su tamaño (0.5 a 2). Lo más cómodo es el botón \"Mover y escalar HUD\" del menú. shinyBonuses: bonus de shiny del servidor en % (ej. [25, 10]); se suman y multiplican la probabilidad base 1/shinyRate.";
 
 	// --- Grabación de combates contra salvajes ---
 	public boolean recordingEnabled = true;
@@ -57,6 +62,30 @@ public final class HuntConfig {
 	public boolean lockSpecies = false;
 	/** Especie fijada (ej. "cobblemon:ralts"); vacía si no hay ninguna. */
 	public String lockedSpecies = "";
+	/**
+	 * Bonificadores de shiny del servidor en %, que escribe el jugador (armaduras, eventos, tickets…).
+	 * Se suman entre sí y multiplican la probabilidad base: +25 % con 1/8192 → 1/6554.
+	 */
+	public List<Double> shinyBonuses = new ArrayList<>();
+
+	/** Suma de los bonificadores, en %. */
+	public double bonusTotal() {
+		double total = 0;
+		for (double bonus : shinyBonuses) {
+			total += bonus;
+		}
+		return total;
+	}
+
+	/** Probabilidad de shiny por encuentro con los bonificadores actuales, de 0 a 1 (nunca más de 1). */
+	public double effectiveChance() {
+		return Math.min(1.0, (1.0 / shinyRate) * (1 + bonusTotal() / 100));
+	}
+
+	/** Tasa efectiva "1 entre N" con los bonificadores actuales (sin redondear; mínimo 1). */
+	public double effectiveRate() {
+		return 1 / effectiveChance();
+	}
 
 	public static HuntConfig load() {
 		HuntConfig config = new HuntConfig();
@@ -88,6 +117,16 @@ public final class HuntConfig {
 		hudOffsetX = Math.clamp(hudOffsetX, MIN_OFFSET, MAX_OFFSET);
 		hudOffsetY = Math.clamp(hudOffsetY, MIN_OFFSET, MAX_OFFSET);
 		hudScale = Float.isNaN(hudScale) ? 1.0f : Math.clamp(hudScale, MIN_SCALE, MAX_SCALE);
+		// Bonificadores: fuera los nulos, NaN, negativos y absurdos; como mucho MAX_BONUSES filas
+		List<Double> bonuses = new ArrayList<>();
+		if (shinyBonuses != null) {
+			for (Double bonus : shinyBonuses) {
+				if (bonus != null && !bonus.isNaN() && bonus >= 0 && bonus <= MAX_BONUS && bonuses.size() < MAX_BONUSES) {
+					bonuses.add(bonus);
+				}
+			}
+		}
+		shinyBonuses = bonuses;
 		return this;
 	}
 

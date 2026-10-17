@@ -38,17 +38,20 @@ public final class HuntHud {
 	/** Contenido de la caza actual; null si no hay ninguna. */
 	public static Content current() {
 		HuntCounter.Entry entry = HuntCounter.currentEntry();
-		return entry == null ? null : content(HuntCounter.currentSpecies(), entry.encounters, entry.huntMillis);
+		return entry == null ? null
+				: content(HuntCounter.currentSpecies(), entry.encounters, entry.huntMillis, entry.chance());
 	}
 
 	/** Ejemplo para la pantalla de mover y escalar cuando no hay caza en curso. */
 	public static Content sample() {
-		return content(SAMPLE_SPECIES, SAMPLE_ENCOUNTERS, SAMPLE_MILLIS);
+		// El ejemplo usa la probabilidad actual en todos sus encuentros
+		double chance = -Math.expm1(SAMPLE_ENCOUNTERS
+				* HuntCounter.encounterLog(CobbleHuntLog.CONFIG.effectiveChance()));
+		return content(SAMPLE_SPECIES, SAMPLE_ENCOUNTERS, SAMPLE_MILLIS, chance);
 	}
 
-	private static Content content(String speciesId, int encounters, long huntMillis) {
+	private static Content content(String speciesId, int encounters, long huntMillis, double chance) {
 		int rate = CobbleHuntLog.CONFIG.shinyRate;
-		double chance = HuntCounter.cumulativeChance(encounters, rate);
 		return new Content(List.of(
 				HuntConfigScreen.speciesName(speciesId).copy().withStyle(ChatFormatting.GOLD),
 				Component.translatable("cobblehuntlog.hud.encounters", encounters),

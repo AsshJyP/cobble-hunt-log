@@ -53,6 +53,32 @@ public final class HuntCounter implements BattleWatcher.Listener {
 	public static final class Entry {
 		public int encounters;
 		public long huntMillis;
+		/**
+		 * Suma de ln(1 − p) de cada encuentro, con la p que había en ese momento (bonificadores incluidos).
+		 * Así la probabilidad acumulada sigue siendo correcta si los bonus cambian a mitad de la caza.
+		 * Null en cazas guardadas por la 0.1.x: se calcula al cargar. Sin valor inicial a propósito: Gson usa
+		 * este constructor, y con "= 0.0" una caza vieja se leería como 0 en vez de null y no se migraría.
+		 */
+		public Double noShinyLog;
+
+		/** Probabilidad de haber visto al menos un shiny en esta caza, de 0 a 1. */
+		public double chance() {
+			return noShinyLog == null ? 0 : -Math.expm1(noShinyLog);
+		}
+	}
+
+	/** Suma a la caza un encuentro con la probabilidad actual. */
+	private static void addEncounter(Entry entry) {
+		entry.encounters++;
+		entry.noShinyLog += encounterLog(CobbleHuntLog.CONFIG.effectiveChance());
+	}
+
+	/**
+	 * ln(1 − p) de un encuentro. Con p = 1 sería −∞, que Gson no sabe guardar: se limita p un poco por debajo
+	 * de 1 (la probabilidad acumulada ya sale 100 % igual).
+	 */
+	static double encounterLog(double chance) {
+		return Math.log1p(-Math.min(chance, 0.999_999));
 	}
 
 	public record ShinyRecord(String species, int encounters, long huntMillis, String date) {}
@@ -76,7 +102,7 @@ public final class HuntCounter implements BattleWatcher.Listener {
 		}
 		data.current = battle.speciesId();
 		Entry entry = entry(battle.speciesId());
-		entry.encounters++;
+		addEncounter(entry);
 		if (battle.shiny()) {
 			onShinyFound(battle.speciesId(), entry);
 		}
@@ -119,7 +145,7 @@ public final class HuntCounter implements BattleWatcher.Listener {
 	static void addManual() {
 		String species = currentSpecies();
 		if (CobbleHuntLog.CONFIG.counterEnabled && !species.isEmpty()) {
-			entry(species).encounters++;
+			addEncounter(entry(species));
 			save();
 		}
 	}
@@ -146,13 +172,13 @@ public final class HuntCounter implements BattleWatcher.Listener {
 	}
 
 	private static Entry entry(String speciesId) {
-		return data.species.computeIfAbsent(speciesId, id -> new Entry());
+		return data.species.computeIfAbsent(speciesId, id -> {
+			Entry entry = new Entry();
+			entry.noShinyLog = 0.0;
+			return entry;
+		});
 	}
 
-	/** Probabilidad de haber visto al menos un shiny en {@code encounters} encuentros, de 0 a 1. */
-	public static double cumulativeChance(int encounters, int rate) {
-		return 1 - Math.pow(1 - 1.0 / Math.max(1, rate), encounters);
-	}
 
 	private static void tick(Minecraft client) {
 		long now = Util.getMillis();
@@ -183,6 +209,14 @@ public final class HuntCounter implements BattleWatcher.Listener {
 					if (read.current == null) read.current = "";
 					if (read.species == null) read.species = new LinkedHashMap<>();
 					if (read.history == null) read.history = new ArrayList<>();
+					// Cazas de la 0.1.x (sin noShinyLog): se calcula con la tasa base, igual que entonces
+					double oldLog = encounterLog(1.0 / CobbleHuntLog.CONFIG.shinyRate);
+					read.species.values().removeIf(entry -> entry == null);
+					for (Entry entry : read.species.values()) {
+						if (entry.noShinyLog == null || entry.noShinyLog.isNaN() || entry.noShinyLog > 0) {
+							entry.noShinyLog = entry.encounters * oldLog;
+						}
+					}
 					return read;
 				}
 			} catch (IOException | JsonParseException e) {

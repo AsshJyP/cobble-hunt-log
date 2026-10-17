@@ -63,8 +63,16 @@ public final class HuntCounter implements BattleWatcher.Listener {
 
 		/** Probabilidad de haber visto al menos un shiny en esta caza, de 0 a 1. */
 		public double chance() {
-			return noShinyLog == null ? 0 : -Math.expm1(noShinyLog);
+			return noShinyLog == null ? 0 : chanceFromLog(noShinyLog);
 		}
+	}
+
+	/**
+	 * 1 − exp(noShinyLog), de 0 a 1. El max quita el "−0.0" que da −expm1(0.0) en una caza recién empezada
+	 * (String.format lo escribiría como "-0.0 %").
+	 */
+	static double chanceFromLog(double noShinyLog) {
+		return Math.max(0.0, -Math.expm1(noShinyLog));
 	}
 
 	/** Suma a la caza un encuentro con la probabilidad actual. */

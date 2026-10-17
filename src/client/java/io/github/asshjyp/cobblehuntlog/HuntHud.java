@@ -46,7 +46,7 @@ public final class HuntHud {
 	/** Ejemplo para la pantalla de mover y escalar cuando no hay caza en curso. */
 	public static Content sample() {
 		// El ejemplo usa la probabilidad actual en todos sus encuentros
-		double chance = -Math.expm1(SAMPLE_ENCOUNTERS
+		double chance = HuntCounter.chanceFromLog(SAMPLE_ENCOUNTERS
 				* HuntCounter.encounterLog(CobbleHuntLog.CONFIG.effectiveChance()));
 		return content(SAMPLE_SPECIES, SAMPLE_ENCOUNTERS, SAMPLE_MILLIS, chance);
 	}
